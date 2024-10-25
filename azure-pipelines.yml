@@ -6,8 +6,6 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
-  dotnetSdkVersion: '6.x'
 
 stages:
   - stage: 'build'
@@ -23,7 +21,7 @@ stages:
         variables: 
           wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
           dotnetSdkVersion: '6.x'
-          
+
         steps:
         - task: UseDotNet@2
           displayName: 'Use .NET SDK $(dotnetSdkVersion)'
