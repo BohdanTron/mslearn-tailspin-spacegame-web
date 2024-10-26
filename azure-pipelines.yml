@@ -52,10 +52,6 @@ stages:
 
         - template: templates/build.yml
           parameters:
-            buildConfiguration: 'Debug'
-
-        - template: templates/build.yml
-          parameters:
             buildConfiguration: 'Release'
 
         - publish: '$(Build.ArtifactStagingDirectory)'
@@ -83,6 +79,6 @@ stages:
                   inputs:
                     azureSubscription: 'Resource Manager - Tailspin - Space Game' # Go to Project Settings -> Service Connection in Azure DevOps
                     appName: '$(WebAppName)'
-                    package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)'
+                    package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
             
 
