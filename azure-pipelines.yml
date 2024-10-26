@@ -8,7 +8,7 @@ variables:
   buildConfiguration: 'Release'
 
 stages:
-  - stage: 'build'
+  - stage: 'Build'
     displayName: 'Build the web application'
     jobs:
       - job: 'Build'
@@ -58,6 +58,31 @@ stages:
           parameters:
             buildConfiguration: 'Release'
 
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Artifact: drop'
-          condition: 'succeeded()'
+        - publish: '$(Build.ArtifactStagingDirectory)'
+          artifact: drop
+
+  - stage: 'Deploy'
+    displayName: 'Deploy the web application'
+    dependsOn: Build
+    jobs:
+      - deployment: Deploy
+        pool:
+          vmImage: 'ubuntu-20.04'
+        environment: dev
+        variables: 
+          - group: Release
+        strategy: 
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: drop
+
+                - task: AzureWebApp@1
+                  displayName: 'Azure App Service Deploy: website'
+                  inputs:
+                    azureSubscription: 'Resource Manager - Tailspin - Space Game' # Go to Project Settings -> Service Connection in Azure DevOps
+                    appName: '$(WebAppName)'
+                    package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)'
+            
+
