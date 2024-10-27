@@ -14,7 +14,7 @@ steps:
     inputs:
       command: 'test'
       arguments: '--no-build --configuration ${{ parameters.buildConfiguration }}'
-      publishTestResults: true
+      publishTestResults: false
       projects: '**/*.Tests.csproj'
 
   - task: DotNetCoreCLI@2
