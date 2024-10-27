@@ -8,6 +8,14 @@ variables:
   buildConfiguration: 'Release'
   releaseBranchName: 'release'
 
+schedules:
+- cron: '0 3 * * *'
+  displayName: 'Deploy every day at 3 A.M.'
+  branches:
+    include:
+    - release
+  always: false # if there are no changes in the branch since the last run, the pipeline will not execute
+
 stages:
   - stage: 'Build'
     displayName: 'Build the web application'
@@ -58,7 +66,6 @@ stages:
         - publish: '$(Build.ArtifactStagingDirectory)'
           artifact: drop
 
-
   - stage: 'Dev'
     displayName: 'Deploy to the dev environment'
     dependsOn: Build
@@ -87,3 +94,28 @@ stages:
                 azureSubscription: 'Resource Manager - Tailspin - Space Game'
                 appName: '$(WebAppNameDev)'
                 package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+
+  - stage: 'Test'
+    displayName: 'Deploy to the test environment'
+    dependsOn: Dev
+    #condition: eq(variables['Build.Reason'], 'Schedule')
+    jobs:
+    - deployment: Deploy
+      pool:
+        vmImage: 'ubuntu-20.04'
+      environment: test
+      variables:
+      - group: 'Release'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - download: current
+              artifact: drop
+            - task: AzureWebApp@1
+              displayName: 'Azure App Service Deploy: website'
+              inputs:
+                azureSubscription: 'Resource Manager - Tailspin - Space Game'
+                appName: '$(WebAppNameTest)'
+                package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+                
