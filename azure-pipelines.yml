@@ -7,6 +7,7 @@ pool:
 variables:
   buildConfiguration: 'Release'
   releaseBranchName: 'release'
+  appName: 'Tailspin.SpaceGame.Web'
 
 schedules:
 - cron: '0 3 * * *'
@@ -93,7 +94,7 @@ stages:
               inputs:
                 azureSubscription: 'Resource Manager - Tailspin - Space Game'
                 appName: '$(WebAppNameDev)'
-                package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+                package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/$(appName).zip'
 
   - stage: 'Test'
     displayName: 'Deploy to the test environment'
@@ -117,7 +118,7 @@ stages:
               inputs:
                 azureSubscription: 'Resource Manager - Tailspin - Space Game'
                 appName: '$(WebAppNameTest)'
-                package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+                package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/$(appName).zip'
 
                 
   - stage: 'Staging'
@@ -141,5 +142,5 @@ stages:
               inputs:
                 azureSubscription: 'Resource Manager - Tailspin - Space Game'
                 appName: '$(WebAppNameStaging)'
-                package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+                package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/$(appName).zip'
   
