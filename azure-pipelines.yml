@@ -8,15 +8,6 @@ variables:
   buildConfiguration: 'Release'
   releaseBranchName: 'release'
 
-schedules:
-  - cron: '0 3 * * *'
-    displayName: 'Deploy every day at 3 A.M'
-    branches:
-      include:
-        - release
-    always: false
-
-
 stages:
   - stage: 'Build'
     displayName: 'Build the web application'
@@ -72,27 +63,27 @@ stages:
     displayName: 'Deploy to the dev environment'
     dependsOn: Build
     condition: |
-      and 
+      and
       (
         succeeded(),
         eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
       )
     jobs:
-      - deployment: Deploy
-        pool:
-          vmImange: 'ubuntu-20.04'
-        environment: dev
-        variables:
-          - group: Release
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - download: current
-                  artifact: drop
-                - task: AzureWebApp@1
-                  displayName: 'Azure App Service Deploy: website'
-                  inputs:
-                    azureSubscription: 'Resource Manager - Tailspin - Space Game' # Go to Project Settings -> Service Connection in Azure DevOps
-                    appName: '$(WebAppName)'
-                    package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
+    - deployment: Deploy
+      pool:
+        vmImage: 'ubuntu-20.04'
+      environment: dev
+      variables:
+      - group: Release
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - download: current
+              artifact: drop
+            - task: AzureWebApp@1
+              displayName: 'Azure App Service Deploy: website'
+              inputs:
+                azureSubscription: 'Resource Manager - Tailspin - Space Game'
+                appName: '$(WebAppNameDev)'
+                package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
