@@ -133,12 +133,14 @@ stages:
           inputs:
             packageType: sdk
             version: '6.x'
+
         - task: DotNetCoreCLI@2
           displayName: 'Build the project - $(dotnetSdkVersion)'
           inputs:
             command: 'build'
-            arguments: '--congfiguration $(buildConfiguration)'
+            arguments: '--configuration $(buildConfiguration)'
             projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
+        
         - task: DotNetCoreCLI@2
           displayName: 'Run UI tests - $(buildConfiguration)'
           inputs:
