@@ -131,20 +131,21 @@ stages:
         - task: UseDotNet@2
           displayName: 'Use .NET SDK $(dotnetSdkVersion)'
           inputs:
-            version: '$(dotnetSdkVersion)'
+            packageType: sdk
+            version: '6.x'
         - task: DotNetCoreCLI@2
-          displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+          displayName: 'Build the project - $(dotnetSdkVersion)'
           inputs:
             command: 'build'
             arguments: '--congfiguration $(buildConfiguration)'
-            projects: '$(System.DefaultWorkingDirectory)/**/*UITests.csproj'
+            projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
         - task: DotNetCoreCLI@2
           displayName: 'Run UI tests - $(buildConfiguration)'
           inputs:
             command: 'test'
             arguments: '--no-build --configuration $(buildConfiguration)'
             publishTestResults: true
-            projects: '$(System.DefaultWorkingDirectory)/**/*UITests.csproj'
+            projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
     
   - stage: 'Staging'
     displayName: 'Deploy to the staging environment'
