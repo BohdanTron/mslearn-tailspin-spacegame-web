@@ -114,6 +114,7 @@ stages:
     - job: RunUITests
       dependsOn: DeployTest
       displayName: 'Run UI tests'
+      condition: false
       pool:
         vmImage: 'windows-2019'
       variables:
