@@ -69,7 +69,7 @@ stages:
         eq(variables['Build.SourceBranchName'], variables['releaseBranchName'])
       )
     jobs:
-    - deployment: DeployDev
+    - deployment: 'Deploy Dev'
       pool:
         vmImage: 'ubuntu-20.04'
       environment: dev
@@ -92,7 +92,7 @@ stages:
     displayName: 'Deploy to the test environment'
     dependsOn: Dev
     jobs:
-    - deployment: DeployTest
+    - deployment: 'Deploy Test'
       pool:
         vmImage: 'ubuntu-20.04'
       environment: test
@@ -112,7 +112,7 @@ stages:
                 package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/$(appName).zip'
 
     - job: RunUITests
-      dependsOn: DeployTest
+      dependsOn: 'Deploy Test'
       displayName: 'Run UI tests'
       pool:
         vmImage: 'windows-2019'
@@ -145,7 +145,7 @@ stages:
     displayName: 'Deploy to the staging environment'
     dependsOn: Test
     jobs:
-    - deployment: DeployTest
+    - deployment: 'Deploy Staging'
       pool:
         vmImage: 'ubuntu-20.04'
       environment: staging
