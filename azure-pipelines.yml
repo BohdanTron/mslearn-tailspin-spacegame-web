@@ -139,13 +139,13 @@ stages:
             arguments: '--no-build --configuration $(buildConfiguration)'
             publishTestResults: true
             projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
-          timeoutInMinutes: 5
+          timeoutInMinutes: 2
     
   - stage: 'Staging'
     displayName: 'Deploy to the staging environment'
     dependsOn: Test
     jobs:
-    - deployment: DeployTest
+    - deployment: DeployStaging
       pool:
         vmImage: 'ubuntu-20.04'
       environment: staging

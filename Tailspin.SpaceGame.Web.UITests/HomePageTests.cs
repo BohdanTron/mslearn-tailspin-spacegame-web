@@ -9,8 +9,8 @@ using System.Collections;
 
 namespace UITests
 {
-    // [TestFixture("Chrome")]
-    // [TestFixture("Firefox")]
+    [TestFixture("Chrome")]
+    [TestFixture("Firefox")]
     [TestFixture("Edge")]
     public class HomePageTest
     {
@@ -60,6 +60,9 @@ namespace UITests
                 // The site name is stored in the SITE_URL environment variable to make 
                 // the tests more flexible.
                 string url = Environment.GetEnvironmentVariable("SITE_URL");
+
+                Console.WriteLine($"Navigating to: {url}");
+
                 driver.Navigate().GoToUrl(url + "/");
 
                 // Wait for the page to be completely loaded.
