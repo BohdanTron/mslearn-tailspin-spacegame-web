@@ -24,12 +24,6 @@ stages:
           wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
 
         steps:
-        - task: UseDotNet@2
-          displayName: 'Use .NET SDK $(dotnetSdkVersion)'
-          inputs:
-            packageType: sdk
-            version: '6.x'
-
         - task: Cache@2
           inputs:
             key: npm | $(Agent.OS) | package-lock.json
@@ -54,13 +48,7 @@ stages:
           displayName: 'Write build info'
           workingDirectory: $(wwwrootDir)
 
-        - task: DotNetCoreCLI@2
-          displayName: 'Restore project dependencies'
-          inputs:
-            command: 'restore'
-            projects: '**/*.csproj'
-
-        - template: templates/build.yml
+        - template: templates/build-dotnet.yml
 
         - publish: '$(Build.ArtifactStagingDirectory)'
           artifact: drop
@@ -93,36 +81,10 @@ stages:
           webAppName: '$(WebAppNameTest)'
           appName: '$(appName)'
 
-      - job: RunUITests
-        dependsOn: DeployTest
-        displayName: 'Run UI tests'
-        condition: false
-        pool:
-          vmImage: 'windows-2019'
-        variables:
-          - group: 'Release'
-        steps:
-          - task: UseDotNet@2
-            displayName: 'Use .NET SDK $(dotnetSdkVersion)'
-            inputs:
-              packageType: sdk
-              version: '$(dotnetSdkVersion)'
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Build the project - $(dotnetSdkVersion)'
-            inputs:
-              command: 'build'
-              arguments: '--configuration Release'
-              projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
-          
-          - task: DotNetCoreCLI@2
-            displayName: 'Run UI tests - Release'
-            inputs:
-              command: 'test'
-              arguments: '--no-build --configuration Release'
-              publishTestResults: true
-              projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
-            timeoutInMinutes: 2
+      - template: templates/run-ui-tests.yml
+        parameters:
+          dependsOn: DeployTest
+          dotnetSdkVersion: '$(dotnetSdkVersion)'
     
   - stage: 'Staging'
     displayName: 'Deploy to the staging environment'
