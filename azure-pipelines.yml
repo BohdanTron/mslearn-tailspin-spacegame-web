@@ -86,76 +86,51 @@ stages:
     displayName: 'Deploy to the test environment'
     dependsOn: Dev
     jobs:
-    - deployment: DeployTest
-      pool:
-        vmImage: 'ubuntu-20.04'
-      environment: test
-      variables:
-      - group: 'Release'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - download: current
-              artifact: drop
-            - task: AzureWebApp@1
-              displayName: 'Azure App Service Deploy: website'
-              inputs:
-                azureSubscription: 'Resource Manager - Tailspin - Space Game'
-                appName: '$(WebAppNameTest)'
-                package: '$(Pipeline.Workspace)/drop/$(appName).zip'
+      - template: templates/deploy.yml
+        parameters:
+          deploymentName: DeployTest
+          environment: test
+          webAppName: '$(WebAppNameTest)'
+          appName: '$(appName)'
 
-    - job: RunUITests
-      dependsOn: DeployTest
-      displayName: 'Run UI tests'
-      condition: false
-      pool:
-        vmImage: 'windows-2019'
-      variables:
-        - group: 'Release'
-      steps:
-        - task: UseDotNet@2
-          displayName: 'Use .NET SDK $(dotnetSdkVersion)'
-          inputs:
-            packageType: sdk
-            version: '6.x'
+      - job: RunUITests
+        dependsOn: DeployTest
+        displayName: 'Run UI tests'
+        condition: false
+        pool:
+          vmImage: 'windows-2019'
+        variables:
+          - group: 'Release'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Use .NET SDK $(dotnetSdkVersion)'
+            inputs:
+              packageType: sdk
+              version: '$(dotnetSdkVersion)'
 
-        - task: DotNetCoreCLI@2
-          displayName: 'Build the project - $(dotnetSdkVersion)'
-          inputs:
-            command: 'build'
-            arguments: '--configuration Release'
-            projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
-        
-        - task: DotNetCoreCLI@2
-          displayName: 'Run UI tests - Release'
-          inputs:
-            command: 'test'
-            arguments: '--no-build --configuration Release'
-            publishTestResults: true
-            projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
-          timeoutInMinutes: 2
+          - task: DotNetCoreCLI@2
+            displayName: 'Build the project - $(dotnetSdkVersion)'
+            inputs:
+              command: 'build'
+              arguments: '--configuration Release'
+              projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
+          
+          - task: DotNetCoreCLI@2
+            displayName: 'Run UI tests - Release'
+            inputs:
+              command: 'test'
+              arguments: '--no-build --configuration Release'
+              publishTestResults: true
+              projects: '$(System.DefaultWorkingDirectory)/**/Tailspin.SpaceGame.Web.UITests.csproj'
+            timeoutInMinutes: 2
     
   - stage: 'Staging'
     displayName: 'Deploy to the staging environment'
     dependsOn: Test
     jobs:
-    - deployment: DeployStaging
-      pool:
-        vmImage: 'ubuntu-20.04'
-      environment: staging
-      variables:
-      - group: 'Release'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - download: current
-              artifact: drop
-            - task: AzureWebApp@1
-              displayName: 'Azure App Service Deploy: website'
-              inputs:
-                azureSubscription: 'Resource Manager - Tailspin - Space Game'
-                appName: '$(WebAppNameStaging)'
-                package: '$(Pipeline.Workspace)/drop/$(appName).zip'
-  
+      - template: templates/deploy.yml
+        parameters:
+          deploymentName: DeployStaging
+          environment: staging
+          webAppName: '$(WebAppNameStaging)'
+          appName: '$(appName)'
