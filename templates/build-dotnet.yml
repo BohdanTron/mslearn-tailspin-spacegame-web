@@ -7,7 +7,7 @@ steps:
     displayName: 'Use .NET SDK ${{ parameters.dotnetSdkVersion }}'
     inputs:
       packageType: sdk
-      version: '6.x'
+      version: '${{ parameters.dotnetSdkVersion }}'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build the project - Release'

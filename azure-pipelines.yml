@@ -49,6 +49,8 @@ stages:
           workingDirectory: $(wwwrootDir)
 
         - template: templates/build-dotnet.yml
+          parameters:
+            dotnetSdkVersion: '$(dotnetSdkVersion)'
 
         - publish: '$(Build.ArtifactStagingDirectory)'
           artifact: drop
