@@ -24,36 +24,14 @@ stages:
           wwwrootDir: 'Tailspin.SpaceGame.Web/wwwroot'
 
         steps:
-        - task: Cache@2
-          inputs:
-            key: npm | $(Agent.OS) | package-lock.json
-            path: $(Build.SourcesDirectory)/node_modules
-            restoreKeys: |
-              npm | $(Agent.OS)
-          displayName: 'Restore node_modules from cache'
+          - template: template/build-frontend.yml
+          
+          - template: templates/build-dotnet.yml
+            parameters:
+              dotnetSdkVersion: '$(dotnetSdkVersion)'
 
-        - task: Npm@1
-          displayName: 'Install dependencies with npm ci'
-          inputs:
-            command: 'ci'
-            customCommand: '--no-audit --ignore-scripts --prefer-offline --progress=false'
-
-        - script: './node_modules/.bin/node-sass $(wwwrootDir) --output $(wwwrootDir)'
-          displayName: 'Compile Sass assets'
-
-        - task: gulp@1
-          displayName: 'Run gulp tasks'
-
-        - script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
-          displayName: 'Write build info'
-          workingDirectory: $(wwwrootDir)
-
-        - template: templates/build-dotnet.yml
-          parameters:
-            dotnetSdkVersion: '$(dotnetSdkVersion)'
-
-        - publish: '$(Build.ArtifactStagingDirectory)'
-          artifact: drop
+          - publish: '$(Build.ArtifactStagingDirectory)'
+            artifact: drop
 
   - stage: 'Dev'
     displayName: 'Deploy to the dev environment'
