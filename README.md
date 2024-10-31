@@ -1,65 +1,24 @@
+# Azure Pipelines Project
 
-# Contributing
+This project was created to explore and learn Azure Pipelines by building, testing, and deploying applications through a CI/CD pipeline.
 
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.microsoft.com.
+## Overview
 
-When you submit a pull request, a CLA-bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., label, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+The pipeline is hosted on [Azure DevOps](https://dev.azure.com/tronbodya/) and can be accessed here.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+## Pipeline Workflow
 
-## For maintainers: Updating feature branches
+The pipeline is designed to build both the .NET and UI applications, followed by a deployment to Azure App Service.
 
-This repository uses feature branches to associate code with specific modules on Microsoft Learn. Any changes you make to the default branch will likely need to be propagated to each feature branch in this repo. A common example is when we need to update Node packages in `package.json`.
+## Environments
 
-Here's one way to update the remote feature branches when you make a change to the default branch. Note that this process deletes all local branches except for `main`.
+There are three deployment environments configured in the pipeline:
 
-```bash
-# Synchronize with the remote main branch
-git checkout main
-git pull origin main
-# Delete all local branches except for main
-git branch | grep -ve "main" | xargs git branch -D
-# List all remote branches except for main
-branches=$(git branch -r 2> /dev/null | grep -ve "main" | cut -d "/" -f 2)
-# Synchronize each branch with main and push the result
-while IFS= read -r branch; do
-    # Fetch and switch to feature branch
-    git fetch origin $branch
-    git checkout $branch
-    # Ensure local environment is free of extra files
-    git clean -xdf
-    # Merge down main
-    git merge --no-ff main
-    # Break out if merge failed
-    if [ $? -ne 0 ]; then
-        break
-    fi
-    # Push update
-    git push origin $branch
-done <<< "$branches"
-# Switch back to main
-git checkout main
-```
+- **Dev:** Automatic deployment when changes are pushed to the release branch.
+- **Test:** Automatic deployment after succeeded execution of 'Dev' stage.
+- **Staging:** Requires manual approval before deployment.
 
-# Legal Notices
-
-Microsoft and any contributors grant you a license to the Microsoft documentation and other content
-in this repository under the [Creative Commons Attribution 4.0 International Public License](https://creativecommons.org/licenses/by/4.0/legalcode),
-see the [LICENSE](LICENSE) file, and grant you a license to any code in the repository under the [MIT License](https://opensource.org/licenses/MIT), see the
-[LICENSE-CODE](LICENSE-CODE) file.
-
-Microsoft, Windows, Microsoft Azure and/or other Microsoft products and services referenced in the documentation
-may be either trademarks or registered trademarks of Microsoft in the United States and/or other countries.
-The licenses for this project do not grant you rights to use any Microsoft names, logos, or trademarks.
-Microsoft's general trademark guidelines can be found at http://go.microsoft.com/fwlink/?LinkID=254653.
-
-Privacy information can be found at https://privacy.microsoft.com/en-us/
-
-Microsoft and any contributors reserve all other rights, whether under their respective copyrights, patents,
-or trademarks, whether by implication, estoppel or otherwise.
+## Key Features
+- **Automated Builds:** Triggers on push events to the release branch, initiating builds for both backend and UI components.
+- **Environment-Specific Deployments:** Each environment has dedicated deployment settings to enable targeted deployments.
+- **Manual Approvals:** Staging deployment requires manual approval, ensuring only reviewed changes make it to the staging environment.
